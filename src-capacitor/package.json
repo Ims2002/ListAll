@@ -1,0 +1,13 @@
+{
+  "name": "list-all",
+  "version": "0.0.1",
+  "description": "List app for every purpose lists",
+  "author": "ims2002 <imsmorsell2002@gmail.com>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  }
+}
