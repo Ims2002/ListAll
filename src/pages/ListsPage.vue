@@ -1,42 +1,29 @@
 <template>
-    <q-layout view="lHh Lpr lFf">
-        <q-header elevated class="text-blue">
-            <q-toolbar class="bg-white no-shadow">
-                <q-toolbar-title class="text-center text-weight-bold">
-                    Mis Listas
-                </q-toolbar-title>
-            </q-toolbar>
-        </q-header>
+    <q-page padding>
+        <q-card flat bordered class="q-pa-md">
+            <q-separator />
 
-        <q-page-container>
-            <q-page padding>
-                <q-card flat bordered class="q-pa-md">
+            <q-card-section>
+                <q-list bordered separator>
+                    <q-item v-for="(item, index) in store.items" :key="index" clickable class="rounded-borders"
+                        @click="goToList(item)">
+                        <q-item-section avatar>
+                            <q-icon :name="item.icon" color="blue" />
+                        </q-item-section>
+                        <q-item-section>
+                            {{ item.title }}
+                        </q-item-section>
+                        <q-item-section side>
+                            <DeleteButton :id="index" @delete="deleteList" />
+                        </q-item-section>
+                    </q-item>
 
-                    <q-separator />
-
-                    <q-card-section>
-                        <q-list bordered separator>
-                            <q-item v-for="(item, index) in items" :key="index" clickable class="rounded-borders">
-                                <q-item-section avatar>
-                                    <q-icon :name="item.icon" color="blue" />
-                                </q-item-section>
-                                <q-item-section>
-                                    {{ item.title }}
-                                </q-item-section>
-                                <q-item-section side>
-                                    <DeleteButton :id="item.id" @delete="deleteList"></DeleteButton>
-                                </q-item-section>
-                            </q-item>
-
-                            <div v-if="items.length === 0" class="text-grey text-center q-mt-md">
-                                No hay listas aún, pulsa el botón <q-icon name="add" /> para
-                                crear una.
-                            </div>
-                        </q-list>
-                    </q-card-section>
-                </q-card>
-            </q-page>
-        </q-page-container>
+                    <div v-if="store.items.length === 0" class="text-grey text-center q-mt-md">
+                        No hay listas aún, pulsa el botón <q-icon name="add" /> para crear una.
+                    </div>
+                </q-list>
+            </q-card-section>
+        </q-card>
 
         <!-- Botón flotante -->
         <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -47,7 +34,7 @@
         <q-dialog v-model="showDialog">
             <q-card style="min-width: 350px;">
                 <q-card-section>
-                    <div class="text-h6">Añadir nuevo item</div>
+                    <div class="text-h6">Añadir lista nueva</div>
                 </q-card-section>
 
                 <q-card-section>
@@ -74,24 +61,26 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
-    </q-layout>
+    </q-page>
 </template>
 
 <script setup>
 import { ref } from "vue"
 import DeleteButton from "src/components/DeleteButton.vue"
+import { useListStore } from "src/stores/listStore"
+import { useRouter } from "vue-router"
 
-const items = ref([])
+const store = useListStore()
+const router = useRouter()
+
+//const items = ref([])
 
 const showDialog = ref(false)
-const newItem = ref({
-    title: "",
-    icon: ""
-})
+const newItem = ref({ title: "", icon: "", items: [] })
 
-// Iconos más comunes de Quasar (puedes ampliar esta lista)
 const iconOptions = [
     { label: "Lista", value: "list" },
+    { label: "Carrito", value: "shopping_cart" },
     { label: "Usuario", value: "person" },
     { label: "Correo", value: "mail" },
     { label: "Teléfono", value: "phone" },
@@ -105,14 +94,18 @@ const iconOptions = [
 
 const saveItem = () => {
     if (newItem.value.title && newItem.value.icon) {
-        items.value.push({ ...newItem.value })
-        newItem.value = { title: "", icon: "" }
+        store.addItem(newItem.value)
+        newItem.value = { title: '', icon: '' }
         showDialog.value = false
     }
 }
 
 function deleteList(id) {
-    items.value = items.value.filter(list => list.id != id);
+    store.deleteItem(id)
+}
+
+function goToList(item) {
+    router.push({ path: `/listas/${item.id}`, query: { title: item.title } })
 }
 
 </script>

@@ -6,7 +6,7 @@
             <q-card>
                 <q-card-section class="row items-center">
                     <q-icon name="warning" color="red" size="md" class="q-mr-sm" />
-                    <span>¿Seguro que quieres eliminar esta lista?</span>
+                    <span>¿Seguro que quieres eliminar este elemento?</span>
                 </q-card-section>
 
                 <q-card-actions align="right">

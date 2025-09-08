@@ -1,81 +1,139 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+    <q-layout view="lHh Lpr lFf">
+        <q-header elevated class="text-blue">
+            <q-toolbar class="bg-white no-shadow">
+                <q-toolbar-title class="text-center text-weight-bold">
+                    Mis Listas
+                </q-toolbar-title>
+            </q-toolbar>
+        </q-header>
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+        <q-page-container>
+            <!-- Aquí se cargan las páginas hijas -->
+            <router-view />
+        </q-page-container>
+    </q-layout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+</script>
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
+
+<!-- <template>
+    <q-layout view="lHh Lpr lFf">
+        <q-header elevated class="text-blue">
+            <q-toolbar class="bg-white no-shadow">
+                <q-toolbar-title class="text-center text-weight-bold">
+                    Mis Listas
+                </q-toolbar-title>
+            </q-toolbar>
+        </q-header>
+
+        <q-page-container>
+            <q-page padding>
+                <q-card flat bordered class="q-pa-md">
+
+                    <q-separator />
+
+                    <q-card-section>
+                        <q-list bordered separator>
+                            <q-item v-for="(item, index) in items" :key="index" clickable class="rounded-borders">
+                                <q-item-section avatar>
+                                    <q-icon :name="item.icon" color="blue" />
+                                </q-item-section>
+                                <q-item-section>
+                                    {{ item.title }}
+                                </q-item-section>
+                                <q-item-section side>
+                                    <DeleteButton :id="item.id" @delete="deleteList"></DeleteButton>
+                                </q-item-section>
+                            </q-item>
+
+                            <div v-if="items.length === 0" class="text-grey text-center q-mt-md">
+                                No hay listas aún, pulsa el botón <q-icon name="add" /> para
+                                crear una.
+                            </div>
+                        </q-list>
+                    </q-card-section>
+                </q-card>
+            </q-page>
+        </q-page-container>
+
+        <q-page-sticky position="bottom-right" :offset="[18, 18]">
+            <q-btn fab icon="add" class="bg-blue" @click="showDialog = true" />
+        </q-page-sticky>
+
+        <q-dialog v-model="showDialog">
+            <q-card style="min-width: 350px;">
+                <q-card-section>
+                    <div class="text-h6">Añadir lista nueva</div>
+                </q-card-section>
+
+                <q-card-section>
+                    <q-input v-model="newItem.title" label="Título" outlined dense />
+
+                    <q-select v-model="newItem.icon" :options="iconOptions" label="Icono" outlined dense emit-value
+                        map-options>
+                        <template v-slot:option="scope">
+                            <q-item v-bind="scope.itemProps">
+                                <q-item-section avatar>
+                                    <q-icon :name="scope.opt.value" />
+                                </q-item-section>
+                                <q-item-section>
+                                    {{ scope.opt.label }}
+                                </q-item-section>
+                            </q-item>
+                        </template>
+                    </q-select>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                    <q-btn flat label="Cancelar" color="negative" v-close-popup />
+                    <q-btn flat label="Guardar" color="positive" @click="saveItem" />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
+    </q-layout>
+</template>
+
+<script setup>
+import { ref } from "vue"
+import DeleteButton from "src/components/DeleteButton.vue"
+
+const items = ref([])
+
+const showDialog = ref(false)
+const newItem = ref({
+    title: "",
+    icon: ""
+})
+
+// Iconos más comunes de Quasar (puedes ampliar esta lista)
+const iconOptions = [
+    { label: "Lista", value: "list" },
+    { label: "Carrito", value: "shopping_cart" },
+    { label: "Usuario", value: "person" },
+    { label: "Correo", value: "mail" },
+    { label: "Teléfono", value: "phone" },
+    { label: "Favorito", value: "favorite" },
+    { label: "Casa", value: "home" },
+    { label: "Trabajo", value: "work" },
+    { label: "Calendario", value: "event" },
+    { label: "Ajustes", value: "settings" },
+    { label: "Buscar", value: "search" }
 ]
 
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+const saveItem = () => {
+    if (newItem.value.title && newItem.value.icon) {
+        items.value.push({ ...newItem.value })
+        newItem.value = { title: "", icon: "" }
+        showDialog.value = false
+    }
 }
-</script>
+
+function deleteList(id) {
+    items.value = items.value.filter(list => list.id != id);
+}
+
+</script> 
+-->
